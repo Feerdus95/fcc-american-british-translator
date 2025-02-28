@@ -15,7 +15,7 @@ const translateHandler = async () => {
   
   // Clear previous results
   if (errorArea) errorArea.innerText = "";
-  if (translatedArea) translatedArea.innerText = "";
+  if (translatedArea) translatedArea.innerHTML = ""; // Use innerHTML
 
   // Validate inputs
   if (!textArea || !localeArea) {
@@ -27,7 +27,7 @@ const translateHandler = async () => {
     const response = await fetch("/api/translate", {
       method: "POST",
       headers: {
-        "Accept": "application/json",
+        "Accept": "text/html, application/json",
         "Content-type": "application/json"
       },
       body: JSON.stringify({
@@ -43,6 +43,10 @@ const translateHandler = async () => {
       return;
     }
 
+    // Log the response to check for highlight tags
+    console.log('API Response:', parsed.translation);
+
+    // Set translated text with innerHTML to preserve highlight tags
     if (translatedArea) translatedArea.innerHTML = parsed.translation;
   } catch (error) {
     console.error("Translation error:", error);

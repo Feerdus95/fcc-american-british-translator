@@ -19,12 +19,10 @@ module.exports = function (app) {
         return res.json({ error: 'Invalid value for locale field' });
       }
 
-      // Determine if highlighting is needed based on test requirements
-      const highlight = req.query.highlight === 'true';
-
+      const wantsHtml = req.get('Accept')?.includes('text/html');
       const translation = locale === 'american-to-british' 
-        ? (highlight ? translator.toBritishHighlight(text) : translator.toBritish(text))
-        : (highlight ? translator.toAmericanHighlight(text) : translator.toAmerican(text));
+        ? (wantsHtml ? translator.toBritishHighlight(text) : translator.toBritish(text))
+        : (wantsHtml ? translator.toAmericanHighlight(text) : translator.toAmerican(text));
 
       res.json({
         text,

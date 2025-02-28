@@ -34,10 +34,6 @@ nav {
   transition: all 0.25s ease-in-out;
 }
 
-.highlight:hover {
-  background-size: 100% 88%;
-}
-
 /* Input field styling */
 .input-field input:focus + label,
 .input-field textarea:focus + label {
