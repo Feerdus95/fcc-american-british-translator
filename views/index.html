@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>American/British Translator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="/node_modules/materialize-css/dist/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/public/style.css">
+  </head>
+  <body class="grey lighten-4">
+    <!-- Header -->
+    <nav class="teal darken-3">
+      <div class="nav-wrapper">
+        <div class="container">
+          <span class="brand-logo center">
+            <i class="material-icons left">translate</i>
+            Translator
+          </span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+      <div class="row" style="margin-top: 2rem;">
+        <div class="col s12 m10 offset-m1 l8 offset-l2">
+          <!-- Main Card -->
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title center-align">
+                <i class="material-icons medium teal-text text-darken-3">compare_arrows</i>
+                <h4 class="teal-text text-darken-3">American/British Translator</h4>
+              </span>
+              
+              <!-- Text Input -->
+              <div class="input-field">
+                <i class="material-icons prefix">edit</i>
+                <textarea id="text-input" class="materialize-textarea"></textarea>
+                <label for="text-input">Text to Translate</label>
+              </div>
+
+              <!-- Locale Select -->
+              <div class="input-field">
+                <i class="material-icons prefix">language</i>
+                <select id="locale-select">
+                  <option value="american-to-british" selected>American to British</option>
+                  <option value="british-to-american">British to American</option>
+                </select>
+                <label>Translation Direction</label>
+              </div>
+
+              <!-- Error Message -->
+              <div id="error-msg" class="red-text center-align"></div>
+
+              <!-- Translate Button -->
+              <div class="center-align" style="margin: 2rem 0;">
+                <button id="translate-btn" class="btn-large waves-effect waves-light teal darken-3 pulse">
+                  Translate
+                  <i class="material-icons right">send</i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Translation Result Card -->
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title teal-text text-darken-3">
+                <i class="material-icons left">description</i>
+                Translation Result
+              </span>
+              <div class="divider"></div>
+              <div id="translated-sentence" class="flow-text" style="margin-top: 1rem;"></div>
+            </div>
+          </div>
+
+          <!-- Info Card -->
+          <div class="card blue-grey lighten-5">
+            <div class="card-content">
+              <div class="row valign-wrapper">
+                <div class="col s2 center-align">
+                  <i class="material-icons medium blue-grey-text">info</i>
+                </div>
+                <div class="col s10">
+                  <p>This translator converts between American and British English variants. Try words like "color/colour" or phrases like "parking lot/car park".</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer teal darken-3">
+      <div class="footer-copyright">
+        <div class="container center-align">
+          © 2025 American to British Translator made by Feerdus 95 for freeCodeCamp
+        </div>
+      </div>
+    </footer>
+
+    <!-- Materialize JS -->
+    <script src="/node_modules/materialize-css/dist/js/materialize.min.js"></script>
+    <!-- Your custom JavaScript -->
+    <script src="/public/index.js"></script>
+  </body>
+</html>
