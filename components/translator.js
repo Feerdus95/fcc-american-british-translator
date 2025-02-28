@@ -12,6 +12,7 @@ class Translator {
 
   translateAndHighlight(strText, strLocale) {
     let strTranslated = '' + strText;
+
     if (strLocale === 'american-to-british') {
       // Translate American spelling differences and wrap in highlight span
       let keys = Object.keys(americanToBritishSpelling);
@@ -19,7 +20,8 @@ class Translator {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, '<span class="highlight">' + americanToBritishSpelling[key] + '</span>');
       }
-      // Translate American titles/honorifics (allowing an optional dot) and wrap in highlight span
+
+      // Translate American titles/honorifics and wrap in highlight span
       let keysTitles = Object.keys(americanToBritishTitles);
       for (let key of keysTitles) {
         let keyRegex = key.endsWith('.') ? key.slice(0, -1) : key;
@@ -32,16 +34,20 @@ class Translator {
           return '<span class="highlight">' + translation + '</span>';
         });
       }
+
       // Translate words that exist only in American English and wrap in highlight span
       let keysOnly = Object.keys(americanOnly);
       for (let key of keysOnly) {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, '<span class="highlight">' + americanOnly[key] + '</span>');
       }
-      // Format time (e.g., "10:30" becomes "10.30") and wrap the entire time string in a highlight span
+
+      // Format time (e.g., "10:30" becomes "10.30") and wrap in highlight span
       let timeRegex = /([0-9]{1,2}):([0-9]{2})/g;
       strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1.$2</span>');
+
     }
+
     if (strLocale === 'british-to-american') {
       // First, translate spelling differences (reverse of American-to-British)
       let keys = Object.keys(americanToBritishSpelling);
@@ -49,6 +55,7 @@ class Translator {
         let regex = new RegExp('\\b' + escapeRegExp(americanToBritishSpelling[key]) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, '<span class="highlight">' + key + '</span>');
       }
+
       // Then, translate titles/honorifics (allowing an optional dot)
       let keysTitles = Object.keys(americanToBritishTitles);
       for (let key of keysTitles) {
@@ -62,23 +69,26 @@ class Translator {
           return '<span class="highlight">' + translation + '</span>';
         });
       }
+
       // Finally, translate words that exist only in British English
       let keysOnly = Object.keys(britishOnly);
       keysOnly.sort((a, b) => b.length - a.length);
-
       for (let key of keysOnly) {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, '<span class="highlight">' + britishOnly[key] + '</span>');
       }
-      // Format time (e.g., "10.30" becomes "10:30") and wrap the entire time string in a highlight span
+
+      // Format time (e.g., "10.30" becomes "10:30") and wrap in highlight span
       let timeRegex = /([0-9]{1,2})\.([0-9]{2})/g;
       strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1:$2</span>');
     }
+
     return strTranslated;
   }
 
   translate(strText, strLocale) {
     let strTranslated = '' + strText;
+
     if (strLocale === 'american-to-british') {
       // Translate American spelling differences
       let keys = Object.keys(americanToBritishSpelling);
@@ -86,6 +96,7 @@ class Translator {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, americanToBritishSpelling[key]);
       }
+
       // Translate American titles/honorifics (allowing an optional dot)
       let keysTitles = Object.keys(americanToBritishTitles);
       for (let key of keysTitles) {
@@ -99,16 +110,19 @@ class Translator {
           return translation; // Do not wrap in highlight span for American to British
         });
       }
+
       // Translate words that exist only in American English
       let keysOnly = Object.keys(americanOnly);
       for (let key of keysOnly) {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, americanOnly[key]);
       }
+
       // Format time (e.g., "10:30" becomes "10.30")
       let timeRegex = /([0-9]{1,2}):([0-9]{2})/g;
       strTranslated = strTranslated.replace(timeRegex, '$1.$2');
     }
+
     if (strLocale === 'british-to-american') {
       // First, translate spelling differences
       let keys = Object.keys(americanToBritishSpelling);
@@ -116,6 +130,7 @@ class Translator {
         let regex = new RegExp('\\b' + escapeRegExp(americanToBritishSpelling[key]) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, key);
       }
+
       // Then, translate titles/honorifics (allowing an optional dot)
       let keysTitles = Object.keys(americanToBritishTitles);
       for (let key of keysTitles) {
@@ -129,6 +144,7 @@ class Translator {
           return translation; // Do not wrap in highlight span for British to American
         });
       }
+
       // Finally, translate words that exist only in British English
       let keysOnly = Object.keys(britishOnly);
       // Sort keys by length in descending order to replace longer phrases first
@@ -138,10 +154,12 @@ class Translator {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, britishOnly[key]);
       }
+
       // Format time (e.g., "10.30" becomes "10:30")
       let timeRegex = /([0-9]{1,2})\.([0-9]{2})/g;
       strTranslated = strTranslated.replace(timeRegex, '$1:$2');
     }
+
     return strTranslated;
   }
 
@@ -149,15 +167,15 @@ class Translator {
   toBritish(text) {
     return this.translate(text, 'american-to-british');
   }
-  
+
   toAmerican(text) {
     return this.translate(text, 'british-to-american');
   }
-  
+
   toBritishHighlight(text) {
     return this.translateAndHighlight(text, 'american-to-british');
   }
-  
+
   toAmericanHighlight(text) {
     return this.translateAndHighlight(text, 'british-to-american');
   }
