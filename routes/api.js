@@ -19,14 +19,17 @@ module.exports = function (app) {
         return res.json({ error: 'Invalid value for locale field' });
       }
 
-      const wantsHtml = req.get('Accept')?.includes('text/html');
       const translation = locale === 'american-to-british' 
-        ? (wantsHtml ? translator.toBritishHighlight(text) : translator.toBritish(text))
-        : (wantsHtml ? translator.toAmericanHighlight(text) : translator.toAmerican(text));
+        ? translator.toBritishHighlight(text)
+        : translator.toAmericanHighlight(text);
+
+      const plainTranslation = locale === 'american-to-british'
+        ? translator.toBritish(text)
+        : translator.toAmerican(text);
 
       res.json({
         text,
-        translation: translation === text ? "Everything looks good to me!" : translation
+        translation: plainTranslation === text ? "Everything looks good to me!" : plainTranslation
       });
     });
 };
