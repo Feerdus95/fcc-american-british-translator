@@ -39,8 +39,8 @@ class Translator {
         strTranslated = strTranslated.replace(regex, '<span class="highlight">' + americanOnly[key] + '</span>');
       }
       // Format time (e.g., "10:30" becomes "10.30") and wrap the entire time string in a highlight span
-      let timeRegex = /([0-9]{1,2})([:])([0-9]{1,2})/g;
-      strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1.$3</span>');
+      let timeRegex = /([0-9]{1,2}):([0-9]{2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1.$2</span>');
     }
     if (strLocale === 'british-to-american') {
       // First, translate spelling differences (reverse of American-to-British)
@@ -64,6 +64,9 @@ class Translator {
       }
       // Finally, translate words that exist only in British English
       let keysOnly = Object.keys(britishOnly);
+      // Sort keys by length in descending order to replace longer phrases first
+      keysOnly.sort((a, b) => b.length - a.length);
+
       for (let key of keysOnly) {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
         strTranslated = strTranslated.replace(regex, (match) => {
@@ -71,8 +74,8 @@ class Translator {
         });
       }
       // Format time (e.g., "10.30" becomes "10:30") and wrap the entire time string in a highlight span
-      let timeRegex = /([0-9]{1,2})([\.])([0-9]{1,2})/g;
-      strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1:$3</span>');
+      let timeRegex = /([0-9]{1,2})\.([0-9]{2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1:$2</span>');
     }
     return strTranslated;
   }
@@ -106,8 +109,8 @@ class Translator {
         strTranslated = strTranslated.replace(regex, americanOnly[key]);
       }
       // Format time (e.g., "10:30" becomes "10.30")
-      let timeRegex = /([0-9]{1,2})([:])([0-9]{1,2})/g;
-      strTranslated = strTranslated.replace(timeRegex, '$1.$3');
+      let timeRegex = /([0-9]{1,2}):([0-9]{2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '$1.$2');
     }
     if (strLocale === 'british-to-american') {
       // First, translate spelling differences
@@ -130,19 +133,17 @@ class Translator {
         });
       }
       // Finally, translate words that exist only in British English
-        let keysOnly = Object.keys(britishOnly);
-        // Sort keys by length in descending order to replace longer phrases first
-        keysOnly.sort((a, b) => b.length - a.length);
+      let keysOnly = Object.keys(britishOnly);
+      // Sort keys by length in descending order to replace longer phrases first
+      keysOnly.sort((a, b) => b.length - a.length);
 
-        for (let key of keysOnly) {
-            let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
-            strTranslated = strTranslated.replace(regex, (match) => {
-              return britishOnly[key];
-            });
-        }
+      for (let key of keysOnly) {
+        let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, britishOnly[key]);
+      }
       // Format time (e.g., "10.30" becomes "10:30")
-      let timeRegex = /([0-9]{1,2})([\.])([0-9]{1,2})/g;
-      strTranslated = strTranslated.replace(timeRegex, '$1:$3');
+      let timeRegex = /([0-9]{1,2})\.([0-9]{2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '$1:$2');
     }
     return strTranslated;
   }
