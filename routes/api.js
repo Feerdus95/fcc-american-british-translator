@@ -20,7 +20,7 @@ module.exports = function (app) {
       }
 
       // Determine if highlighting is needed based on test requirements
-      const highlight = false; // Set to true if highlighting is needed
+      const highlight = req.query.highlight === 'true';
 
       const translation = locale === 'american-to-british' 
         ? (highlight ? translator.toBritishHighlight(text) : translator.toBritish(text))
