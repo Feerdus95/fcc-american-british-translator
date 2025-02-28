@@ -20,16 +20,12 @@ module.exports = function (app) {
       }
 
       const translation = locale === 'american-to-british' 
-        ? translator.toBritishHighlight(text)
-        : translator.toAmericanHighlight(text);
-
-      const plainTranslation = locale === 'american-to-british'
-        ? translator.toBritish(text)
-        : translator.toAmerican(text);
+        ? translator.toBritishHighlight(text)   // <-- Use the highlighted version
+        : translator.toAmericanHighlight(text); // <-- Use the highlighted version
 
       res.json({
         text,
-        translation: plainTranslation === text ? "Everything looks good to me!" : plainTranslation
+        translation: translation === text ? "Everything looks good to me!" : translation
       });
     });
 };
