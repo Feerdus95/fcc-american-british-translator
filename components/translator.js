@@ -64,14 +64,11 @@ class Translator {
       }
       // Finally, translate words that exist only in British English
       let keysOnly = Object.keys(britishOnly);
-      // Sort keys by length in descending order to replace longer phrases first
       keysOnly.sort((a, b) => b.length - a.length);
 
       for (let key of keysOnly) {
         let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
-        strTranslated = strTranslated.replace(regex, (match) => {
-          return '<span class="highlight">' + britishOnly[key] + '</span>';
-        });
+        strTranslated = strTranslated.replace(regex, '<span class="highlight">' + britishOnly[key] + '</span>');
       }
       // Format time (e.g., "10.30" becomes "10:30") and wrap the entire time string in a highlight span
       let timeRegex = /([0-9]{1,2})\.([0-9]{2})/g;
