@@ -1,172 +1,167 @@
 const americanOnly = require('./american-only.js');
 const americanToBritishSpelling = require('./american-to-british-spelling.js');
-const americanToBritishTitles = require("./american-to-british-titles.js")
-const britishOnly = require('./british-only.js')
+const americanToBritishTitles = require("./american-to-british-titles.js");
+const britishOnly = require('./british-only.js');
+
+// Function to escape special characters in a string for use in a regex
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 class Translator {
+
+  translateAndHighlight(strText, strLocale) {
+    let strTranslated = '' + strText;
+    if (strLocale === 'american-to-british') {
+      // Translate American spelling differences and wrap in highlight span
+      let keys = Object.keys(americanToBritishSpelling);
+      for (let key of keys) {
+        let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, '<span class="highlight">' + americanToBritishSpelling[key] + '</span>');
+      }
+      // Translate American titles/honorifics (allowing an optional dot) and wrap in highlight span
+      let keysTitles = Object.keys(americanToBritishTitles);
+      for (let key of keysTitles) {
+        let keyRegex = key.endsWith('.') ? key.slice(0, -1) : key;
+        let regex = new RegExp('\\b' + escapeRegExp(keyRegex) + '\\.?(?=\\s|$|,)', 'gi');
+        strTranslated = strTranslated.replace(regex, function(match) {
+          let translation = americanToBritishTitles[key];
+          if (match[0] === match[0].toUpperCase()) {
+            translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+          }
+          return '<span class="highlight">' + translation + '</span>';
+        });
+      }
+      // Translate words that exist only in American English and wrap in highlight span
+      let keysOnly = Object.keys(americanOnly);
+      for (let key of keysOnly) {
+        let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, '<span class="highlight">' + americanOnly[key] + '</span>');
+      }
+      // Format time (e.g., "10:30" becomes "10.30") and wrap the entire time string in a highlight span
+      let timeRegex = /([0-9]{1,2})([:])([0-9]{1,2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1.$3</span>');
+    }
+    if (strLocale === 'british-to-american') {
+      // First, translate spelling differences (reverse of American-to-British)
+      let keys = Object.keys(americanToBritishSpelling);
+      for (let key of keys) {
+        let regex = new RegExp('\\b' + escapeRegExp(americanToBritishSpelling[key]) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, '<span class="highlight">' + key + '</span>');
+      }
+      // Then, translate titles/honorifics (allowing an optional dot)
+      let keysTitles = Object.keys(americanToBritishTitles);
+      for (let key of keysTitles) {
+        let keyRegex = key.endsWith('.') ? key.slice(0, -1) : key;
+        let regex = new RegExp('\\b' + escapeRegExp(americanToBritishTitles[key]) + '\\.?(?=\\s|$|,)', 'gi');
+        strTranslated = strTranslated.replace(regex, function(match) {
+          let translation = key;
+          if (match[0] === match[0].toUpperCase()) {
+            translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+          }
+          return '<span class="highlight">' + translation + '</span>';
+        });
+      }
+      // Finally, translate words that exist only in British English
+      let keysOnly = Object.keys(britishOnly);
+      for (let key of keysOnly) {
+        let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, (match) => {
+          return '<span class="highlight">' + britishOnly[key] + '</span>';
+        });
+      }
+      // Format time (e.g., "10.30" becomes "10:30") and wrap the entire time string in a highlight span
+      let timeRegex = /([0-9]{1,2})([\.])([0-9]{1,2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '<span class="highlight">$1:$3</span>');
+    }
+    return strTranslated;
+  }
+
+  translate(strText, strLocale) {
+    let strTranslated = '' + strText;
+    if (strLocale === 'american-to-british') {
+      // Translate American spelling differences
+      let keys = Object.keys(americanToBritishSpelling);
+      for (let key of keys) {
+        let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, americanToBritishSpelling[key]);
+      }
+      // Translate American titles/honorifics (allowing an optional dot)
+      let keysTitles = Object.keys(americanToBritishTitles);
+      for (let key of keysTitles) {
+        let keyRegex = key.endsWith('.') ? key.slice(0, -1) : key;
+        let regex = new RegExp('\\b' + escapeRegExp(keyRegex) + '\\.?(?=\\s|$|,)', 'gi');
+        strTranslated = strTranslated.replace(regex, function(match) {
+          let translation = americanToBritishTitles[key];
+          if (match[0] === match[0].toUpperCase()) {
+            translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+          }
+          return translation;
+        });
+      }
+      // Translate words that exist only in American English
+      let keysOnly = Object.keys(americanOnly);
+      for (let key of keysOnly) {
+        let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, americanOnly[key]);
+      }
+      // Format time (e.g., "10:30" becomes "10.30")
+      let timeRegex = /([0-9]{1,2})([:])([0-9]{1,2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '$1.$3');
+    }
+    if (strLocale === 'british-to-american') {
+      // First, translate spelling differences
+      let keys = Object.keys(americanToBritishSpelling);
+      for (let key of keys) {
+        let regex = new RegExp('\\b' + escapeRegExp(americanToBritishSpelling[key]) + '\\b', 'gi');
+        strTranslated = strTranslated.replace(regex, key);
+      }
+      // Then, translate titles/honorifics (allowing an optional dot)
+      let keysTitles = Object.keys(americanToBritishTitles);
+      for (let key of keysTitles) {
+        let keyRegex = key.endsWith('.') ? key.slice(0, -1) : key;
+        let regex = new RegExp('\\b' + escapeRegExp(americanToBritishTitles[key]) + '\\.?(?=\\s|$|,)', 'gi');
+        strTranslated = strTranslated.replace(regex, function(match) {
+          let translation = key;
+          if (match[0] === match[0].toUpperCase()) {
+            translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+          }
+          return translation;
+        });
+      }
+      // Finally, translate words that exist only in British English
+        let keysOnly = Object.keys(britishOnly);
+        // Sort keys by length in descending order to replace longer phrases first
+        keysOnly.sort((a, b) => b.length - a.length);
+
+        for (let key of keysOnly) {
+            let regex = new RegExp('\\b' + escapeRegExp(key) + '\\b', 'gi');
+            strTranslated = strTranslated.replace(regex, (match) => {
+              return britishOnly[key];
+            });
+        }
+      // Format time (e.g., "10.30" becomes "10:30")
+      let timeRegex = /([0-9]{1,2})([\.])([0-9]{1,2})/g;
+      strTranslated = strTranslated.replace(timeRegex, '$1:$3');
+    }
+    return strTranslated;
+  }
+
+  // Wrapper methods required by the tests
   toBritish(text) {
-    let translation = text;
-
-    // Convert American titles to British first to handle periods
-     for (let title in americanToBritishTitles) {
-        const regex = new RegExp(`(?<!\\w)${title.replace(/\./g, '\\.')}(?!\\w)`, 'gi');
-        translation = translation.replace(regex, (match) => {
-        const replacement = americanToBritishTitles[title];
-        // If the first letter of the match is uppercase, capitalize the replacement's first letter.
-        return match[0] === match[0].toUpperCase()
-        ? replacement.charAt(0).toUpperCase() + replacement.slice(1)
-        : replacement;
-        });
-    }
-
-    // Convert American words/phrases to British
-    for (let word in americanOnly) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      translation = translation.replace(regex, americanOnly[word]);
-    }
-
-    // Convert American spellings to British
-    for (let word in americanToBritishSpelling) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      translation = translation.replace(regex, americanToBritishSpelling[word]);
-    }
-
-    // Convert time format from 12:15 to 12.15
-    translation = translation.replace(/([0-9]{1,2}):([0-9]{2})/g, '$1.$2');
-
-    return translation === text ? text : translation;
+    return this.translate(text, 'american-to-british');
   }
-
+  
   toAmerican(text) {
-    let translation = text;
-
-    // Convert British titles to American first
-     for (let title in americanToBritishTitles) {
-        const britishTitle = americanToBritishTitles[title];
-        const regex = new RegExp(`(?<!\\w)${britishTitle}(?!\\w)`, 'gi');
-        translation = translation.replace(regex, (match) => {
-        // If the first letter of the match is uppercase, capitalize the American title accordingly.
-        return match[0] === match[0].toUpperCase()
-        ? title.charAt(0).toUpperCase() + title.slice(1)
-        : title;
-        });
-    }
-
-    // Convert British words/phrases to American
-    const sortedBritishWords = Object.keys(britishOnly).sort((a, b) => b.length - a.length);
-    for (let word of sortedBritishWords) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      translation = translation.replace(regex, britishOnly[word]);
-    }
-
-    // Convert British spellings to American
-    for (let word in americanToBritishSpelling) {
-      const britishWord = americanToBritishSpelling[word];
-      const regex = new RegExp(`\\b${britishWord}\\b`, 'gi');
-      translation = translation.replace(regex, word);
-    }
-
-    // Convert time format from 12.15 to 12:15
-    translation = translation.replace(/([0-9]{1,2})\.([0-9]{2})/g, '$1:$2');
-
-    return translation === text ? text : translation;
+    return this.translate(text, 'british-to-american');
   }
-
+  
   toBritishHighlight(text) {
-    let translation = text;
-    let changes = [];
-
-    // Track American titles first
-    for (let title in americanToBritishTitles) {
-      const regex = new RegExp(`(?<!\\w)${title.replace(/\./g, '\\.')}(?!\\w)`, 'g');
-      let match;
-      while ((match = regex.exec(translation)) !== null) {
-        changes.push({ from: match[0], to: americanToBritishTitles[title] });
-      }
-    }
-
-    // Track American words/phrases
-    for (let word in americanOnly) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      let match;
-      while ((match = regex.exec(translation)) !== null) {
-        changes.push({ from: match[0], to: americanOnly[word] });
-      }
-    }
-
-    // Track American spellings
-    for (let word in americanToBritishSpelling) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      let match;
-      while ((match = regex.exec(translation)) !== null) {
-        changes.push({ from: match[0], to: americanToBritishSpelling[word] });
-      }
-    }
-
-    // Track time format changes
-    const timeRegex = /([0-9]{1,2}):([0-9]{2})/g;
-    let match;
-    while ((match = timeRegex.exec(translation)) !== null) {
-      changes.push({ from: match[0], to: match[0].replace(':', '.') });
-    }
-
-    // Apply all changes with highlighting
-    for (let change of changes) {
-      const regex = new RegExp(change.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-      translation = translation.replace(regex, `<span class="highlight">${change.to}</span>`);
-    }
-
-    return translation === text ? text : translation;
+    return this.translateAndHighlight(text, 'american-to-british');
   }
-
+  
   toAmericanHighlight(text) {
-    let translation = text;
-    let changes = [];
-
-    // Track British titles first
-    for (let title in americanToBritishTitles) {
-      const britishTitle = americanToBritishTitles[title];
-      const regex = new RegExp(`(?<!\\w)${britishTitle}(?!\\w)`, 'g');
-      let match;
-      while ((match = regex.exec(translation)) !== null) {
-        changes.push({ from: match[0], to: title });
-      }
-    }
-
-    // Track British words/phrases
-    const sortedBritishWords = Object.keys(britishOnly).sort((a, b) => b.length - a.length);
-    for (let word of sortedBritishWords) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      let match;
-      while ((match = regex.exec(translation)) !== null) {
-        changes.push({ from: match[0], to: britishOnly[word] });
-      }
-    }
-
-    // Track British spellings
-    for (let word in americanToBritishSpelling) {
-      const britishWord = americanToBritishSpelling[word];
-      const regex = new RegExp(`\\b${britishWord}\\b`, 'gi');
-      let match;
-      while ((match = regex.exec(translation)) !== null) {
-        changes.push({ from: match[0], to: word });
-      }
-    }
-
-    // Track time format changes
-    const timeRegex = /([0-9]{1,2})\.([0-9]{2})/g;
-    let match;
-    while ((match = timeRegex.exec(translation)) !== null) {
-      changes.push({ from: match[0], to: match[0].replace('.', ':') });
-    }
-
-    // Apply all changes with highlighting
-    for (let change of changes) {
-      const regex = new RegExp(change.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-      translation = translation.replace(regex, `<span class="highlight">${change.to}</span>`);
-    }
-
-    return translation === text ? text : translation;
+    return this.translateAndHighlight(text, 'british-to-american');
   }
 }
 
