@@ -99,7 +99,7 @@ class Translator {
           if (match[0] === match[0].toUpperCase()) {
             translation = translation.charAt(0).toUpperCase() + translation.slice(1);
           }
-          return translation;
+          return translation; // Do not wrap in highlight span for American to British
         });
       }
       // Translate words that exist only in American English
@@ -125,11 +125,11 @@ class Translator {
         let keyRegex = key.endsWith('.') ? key.slice(0, -1) : key;
         let regex = new RegExp('\\b' + escapeRegExp(americanToBritishTitles[key]) + '\\.?(?=\\s|$|,)', 'gi');
         strTranslated = strTranslated.replace(regex, function(match) {
-          let translation = key;
+          let translation = key; // Keep the title as is
           if (match[0] === match[0].toUpperCase()) {
             translation = translation.charAt(0).toUpperCase() + translation.slice(1);
           }
-          return translation;
+          return translation; // Do not wrap in highlight span for British to American
         });
       }
       // Finally, translate words that exist only in British English
